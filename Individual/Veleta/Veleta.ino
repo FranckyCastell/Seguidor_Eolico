@@ -1,3 +1,5 @@
+//https://bpb-ap-se2.wpmucdn.com/blogs.auckland.ac.nz/dist/9/698/files/2021/08/2_Pinout_D1_R32.png
+
 // PITCH PIN [ 16 ] DIGITAL
 // VELETA PIN [ 34 ] ANALOGICO
 // CLEAN BUFFER PIN [ 4 ] ANALOGICO
@@ -5,7 +7,6 @@
 #define __DEBUG__
 #include <ESP32Servo.h>
 
-<<<<<<< HEAD
 Servo SPitch;         // SERVOMOTOR PITCH
 int Angulo_Servo = 0; // ANGULO DEL SERVOMOTOR
 
@@ -17,40 +18,19 @@ void setup()
 {
   Serial.begin(9600); // INICIAMOS COMUNICACION SERIAL
   SPitch.attach(16);  // DEFINIMOS SERVOMOTOR PIN 25 ( PITCH )
-=======
-Servo SPitch;
-int Angulo_Servo = 0; // Variable para el ángulo del servomotor
-
-int Clean_Buffer = 39;
-const int Veleta = 34;
-float Valor_Veleta = 0;
-
-void setup()
-{
-  Serial.begin(9600); // Inicia la comunicación serial
-  SPitch.attach(25); // DEFINIMOS SERVOMOTOR PIN 25 ( HORIZONTAL )
->>>>>>> cb39953b08645c85c6166ed1623923767d0af232
 }
 
 void loop()
 {
   analogRead(Clean_Buffer);          // PONEMOS EL BUFFER A VALOR DE 0
-<<<<<<< HEAD
   Valor_Veleta = analogRead(Veleta); // LEEMOS VALOR DEL POTENCIOMETRO "VELETA" ANALOGICO
-=======
-  Valor_Veleta = analogRead(Veleta); // Lee el valor del potenciómetro
->>>>>>> cb39953b08645c85c6166ed1623923767d0af232
 
   Serial.print("Valor Analogico: ");
   Serial.println(Valor_Veleta);
 
   Serial.print("DIRECCION VIENTO: ");
 
-<<<<<<< HEAD
   // CALCULAMOS DIRECCION DE DONDE VIENE EL VIENTOS
-=======
-  // Calcula la dirección basándose en el valor del potenciómetro
->>>>>>> cb39953b08645c85c6166ed1623923767d0af232
   if ((Valor_Veleta >= 3839.1) || (Valor_Veleta <= 255.9))
   {
     Serial.println("NORTE");
@@ -87,15 +67,12 @@ void loop()
   // Mapea el valor analógico a un rango de 0-360 grados para el servomotor
   Angulo_Servo = map(Valor_Veleta, 0, 4095, 0, 360);
 
-<<<<<<< HEAD
   // MOVEMOS SERVOMOTOR AL ANGULO CORRESPONDIENTE
   SPitch.write(Angulo_Servo);
 
-  delay(500);
-=======
-  // Mueve el servomotor al ángulo correspondiente
-  SPitch.write(Angulo_Servo);
+  // IMPRIMIMOS EL ÁNGULO DEL SERVOMOTOR
+  Serial.print("ANGULO SERVOMOTOR: ");
+  Serial.println(Angulo_Servo);
 
-  delay(500); // Espera un segundo antes de leer de nuevo
->>>>>>> cb39953b08645c85c6166ed1623923767d0af232
+  delay(500);
 }
