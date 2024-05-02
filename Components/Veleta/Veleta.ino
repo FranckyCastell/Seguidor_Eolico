@@ -65,7 +65,7 @@ void loop()
   }
 
   // Mapea el valor analógico a un rango de 0-360 grados para el servomotor
-  Angulo_Servo = map(Valor_Veleta, 0, 4095, 0, 360);
+  Angulo_Servo = map(Valor_Veleta, 0, 4095, 0, 255);
 
   // MOVEMOS SERVOMOTOR AL ANGULO CORRESPONDIENTE
   SPitch.write(Angulo_Servo);
