@@ -7,6 +7,16 @@
 // #include <Servo.h>
 #include <ESP32Servo.h>
 #define __DEBUG__
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+// DECLARACIONES PARA LA PANTALLA OLED
+#define ANCHO_PANTALLA 128
+#define ALTO_PANTALLA 64
+Adafruit_SSD1306 display(ANCHO_PANTALLA, ALTO_PANTALLA, &Wire, -1);
+// DECLARACIONES PARA LA PANTALLA OLED
 
 int Clean_Buffer = 39; // CLEAN BOOFER VALOR "GROUND" = 0
 
@@ -22,6 +32,9 @@ Servo SPala3;
 
 void setup()
 {
+
+// INICIAMOS PANTALLA OLED
+#ifdef __DEBUG__
   Serial.begin(9600);
 
   // SERVOMOTORES / PALAS
@@ -29,10 +42,31 @@ void setup()
   SPala2.attach(25);
   SPala3.attach(17);
   // SERVOMOTORES / PALAS
+
+  Serial.println("~ INICIANDO PANTALLA OLED ~");
+#endif
+
+  // INICIAMOS PANTALLA OLED EN LA DIRECCIÓN 0x3C
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C))
+  {
+#ifdef __DEBUG__
+    Serial.println("NO SE A ENCONTRADO PANTALLA OLED");
+#endif
+    while (true)
+      ;
+  }
+  // INICIAMOS PANTALLA OLED
 }
 
 void loop()
 {
+
+  // OLED CONSTANTS
+  display.clearDisplay();              // BORRAMOS CONTENIDO DE LA PANTALLA OLED
+  display.setTextSize(1);              // DEFINIMOS TAMAÑO DEL TEXTO QUE SE VA A MOSTRAR EL 1 ES EL TAMAÑO MINIMO
+  display.setTextColor(SSD1306_WHITE); // COLOR DEL TEXTO
+  // OLED CONSTANTS
+
   // ANEMOMETRO
   analogRead(Clean_Buffer); // PONEMOS EL BUFFER A VALOR DE 0
   // TENSION
@@ -52,29 +86,77 @@ void loop()
   // VELOCIDAD VIENTO
   // ANEMOMETRO
 
+  /*   // PALAS
+    if (velocidadViento >= 3.1)
+    {
+      // VELOCIDAD DEL VIENTO SUPERA LOS 3.1 m/seg PONER A 90 GRADOS
+      SPala1.write(60);
+      SPala2.write(60);
+      SPala3.write(60);
+    }
+    else if (velocidadViento <= 1.4)
+    {
+      // VELOCIDAD DEL VIENTO INFERIOR A LOS 1.4 m/seg PONER A 90 GRADOS
+      SPala1.write(60);
+      SPala2.write(60);
+      SPala3.write(60);
+    }
+    else if (velocidadViento > 1.5 && velocidadViento < 3.0)
+    {
+      // VELOCIDAD DEL VIENTO ENTRE 1.5 m/seg & 3.0 m/seg PONER A 45 GRADOS
+      SPala1.write(0);
+      SPala2.write(0);
+      SPala3.write(0);
+    }
+    // PALAS */
+
   // PALAS
-  if (velocidadViento >= 7.1)
+  const float margenError = 0.4;     // Margen de ±0.4 m/s
+  float velocidadVientoAnterior = 0; // Almacenar la última velocidad del viento que causó un cambio en las palas
+
+  if (abs(velocidadViento - velocidadVientoAnterior) > margenError)
   {
-    // VELOCIDAD DEL VIENTO SUPERA LOS 7 m/seg PONER A 90 GRADOS
-    SPala1.write(90);
-    SPala2.write(90);
-    SPala3.write(90);
-  }
-  else if (velocidadViento <= 3.1)
-  {
-    // VELOCIDAD DEL VIENTO INFERIOR A LOS 3 m/seg PONER A 90 GRADOS
-    SPala1.write(90);
-    SPala2.write(90);
-    SPala3.write(90);
-  }
-  else if (velocidadViento > 3.0 && velocidadViento < 7.0)
-  {
-    // VELOCIDAD DEL VIENTO ENTRE 3 m/seg & 7 m/seg PONER A 45 GRADOS
-    SPala1.write(45);
-    SPala2.write(45);
-    SPala3.write(45);
+    if (velocidadViento >= 3.1)
+    {
+      // VELOCIDAD DEL VIENTO SUPERA LOS 3.1 m/seg PONER A 90 GRADOS
+      SPala1.write(60);
+      SPala2.write(60);
+      SPala3.write(60);
+    }
+    else if (velocidadViento <= 1.4)
+    {
+      // VELOCIDAD DEL VIENTO INFERIOR A LOS 1.4 m/seg PONER A 90 GRADOS
+      SPala1.write(60);
+      SPala2.write(60);
+      SPala3.write(60);
+    }
+    else if (velocidadViento > 1.5 && velocidadViento < 3.0)
+    {
+      // VELOCIDAD DEL VIENTO ENTRE 1.5 m/seg & 3.0 m/seg PONER A 45 GRADOS
+      SPala1.write(0);
+      SPala2.write(0);
+      SPala3.write(0);
+    }
+    // Actualizar la velocidad del viento anterior después de mover las palas
+    velocidadVientoAnterior = velocidadViento;
   }
   // PALAS
 
+  // OLED LOOP
+  display.setCursor(25, 10);      // MOVEMOS EL CURSOR EN LA POSICION ( 25, 10 ) DE LA PANTALLA OLED | COLUMNA, FILA
+  display.print("~~ KALAMAR ~~"); // IMPRIMIMOS TEXTO
+
+  display.setCursor(10, 30);   // MOVEMOS EL CURSOR EN LA POSICION ( 20, 30 ) DE LA PANTALLA OLED | COLUMNA, FILA
+  display.print("Voltaje:  "); // IMPRIMIMOS TEXTO
+  display.print(voltaje);      // IMPRIMIMOS EL ACIMUT A LA QUE SE ENCUENTRA EL SERVO MOTOR EN ESTE MOMENTO
+  display.print(" V");
+
+  display.setCursor(10, 50);      // MOVEMOS EL CURSOR EN LA POSICION ( 20, 30 ) DE LA PANTALLA OLED | COLUMNA, FILA
+  display.print("Vel Vent:  ");   // IMPRIMIMOS TEXTO
+  display.print(velocidadViento); // IMPRIMIMOS EL ACIMUT A LA QUE SE ENCUENTRA EL SERVO MOTOR EN ESTE MOMENTO
+  display.print(" m/s");          // IMPRIMIMOS TEXTO
+
+  display.display(); // ACTUALIZAMOS LA PANTALLA CON LOS DATOS ANTERIORES
+  // OLED LOOP
   delay(200);
 }
