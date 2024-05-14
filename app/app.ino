@@ -32,9 +32,9 @@ Servo SPala2; // SERVO PARA LA PALA 2
 Servo SPala3; // SERVO PARA LA PALA 3
 // CREACION DE LOS SERVO MOTORES PARA CADA UNA DE LAS PALAS
 
-// VARIABLES DEL ANEMOMETRO
+// ANEMOMETRO
 int Anemometro = 4; // PIN DEL ANEMOMETRO " ANALOGICO "
-// VARIABLES PARA EL ANEMOMETRO
+// ANEMOMETRO
 
 // VARIABLES DE LA VELETA
 Servo SPitch;         // SERVO PARA MOVER EL MOLINO HACIA EL VIENTO
@@ -96,30 +96,52 @@ void loop()
     Serial.print("Velocidad del viento: "); // IMPRIMIMOS TEXTO
     Serial.print(VelocidadViento);          // IMPRIMIMOS TEXTO
     Serial.println(" m/s");                 // IMPRIMIMOS TEXTO
-    // VELOCIDAD VIENTO
-    // ANEMOMETRO
+                                            // VELOCIDAD VIENTO
 
+    const float margenError = 0.4;     // Margen de ±0.4 m/s
+    float velocidadVientoAnterior = 0; // Almacenar la última velocidad del viento que causó un cambio en las palas
+
+    // ANEMOMETRO
     // PALAS
-    if (VelocidadViento >= 7.1)
+    if (abs(VelocidadViento - velocidadVientoAnterior) > margenError) // SI LA VELOCIDAD DEL VIENTO ACTUAL - LA VELOCIDAD DEL VIENTO ANTERIOR NO HAY UN MARGEN SUPERIOR A 0.4 QUE NO HAGA NADA
     {
-        // VELOCIDAD DEL VIENTO SUPERA LOS 7 m/seg PONER A 90 GRADOS
-        SPala1.write(90);
-        SPala2.write(90);
-        SPala3.write(90);
-    }
-    else if (VelocidadViento <= 3.1)
-    {
-        // VELOCIDAD DEL VIENTO INFERIOR A LOS 3 m/seg PONER A 90 GRADOS
-        SPala1.write(90);
-        SPala2.write(90);
-        SPala3.write(90);
-    }
-    else if (VelocidadViento > 3.0 && VelocidadViento < 7.0)
-    {
-        // VELOCIDAD DEL VIENTO ENTRE 3 m/seg & 7 m/seg PONER A 45 GRADOS
-        SPala1.write(45);
-        SPala2.write(45);
-        SPala3.write(45);
+        if (VelocidadViento >= 3.1) // SI LA VELOCIDAD ES IGUAL O SUPERIOR A 3.1 ENTRE EN ESTE CONDICIONAL
+        {
+            int anguloActual = SPala1.read(); // LEE EL ANGULO ACTUAL DE LA PALA 1
+            while (anguloActual < 60)         // MIENTRAS QUE EL ANGULO ACTUAL DE LA PALA 1 ES MENOR QUE 60 GRADOS
+            {
+                anguloActual++;             // SUMANDO 1 EN 1 EL ANGULO ACTUAL
+                SPala1.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 60
+                SPala2.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 60
+                SPala3.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 60
+                delay(200);                 // DELAY DE MOVIMIENTO DE LAS PALAS PARA QUE HAGA UN MOVIMIENTO LENTAMENTE
+            }
+        }
+        else if (VelocidadViento <= 1.4) // SI LA VELOCIDAD ES MENOR O IGUAL A 1.4 ENTRE EN ESTE CONDICIONAL
+        {
+            int anguloActual = SPala1.read(); // LEE EL ANGULO ACTUAL DE LA PALA 1
+            while (anguloActual < 60)         // MIENTRAS QUE EL ANGULO ACTUAL DE LA PALA 1 ES MENOR QUE 60 GRADOS
+            {
+                anguloActual++;             // SUMANDO 1 EN 1 EL ANGULO ACTUAL
+                SPala1.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 60
+                SPala2.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 60
+                SPala3.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 60
+                delay(200);                 // DELAY DE MOVIMIENTO DE LAS PALAS PARA QUE HAGA UN MOVIMIENTO LENTAMENTE
+            }
+        }
+        else if (VelocidadViento > 1.5 && VelocidadViento < 3.0) // SI LA VELOCIDAD ES MAYOR A 1.5 & MENOR A 3.0 ENTRE EN ESTE CONDICIONAL
+        {
+            int anguloActual = SPala1.read(); // LEE EL ANGULO ACTUAL DE LA PALA 1
+            while (anguloActual > 0)          // MIENTRAS QUE EL ANGULO ACTUAL DE LA PALA 1 ES MAYOR QUE 0 GRADOS
+            {
+                anguloActual--;             // RESTANDO 1 EN 1 EL ANGULO ACTUAL
+                SPala1.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 0
+                SPala2.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 0
+                SPala3.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 0
+                delay(200);                 // DELAY DE MOVIMIENTO DE LAS PALAS PARA QUE HAGA UN MOVIMIENTO LENTAMENTE
+            }
+        }
+        velocidadVientoAnterior = VelocidadViento; // DEFINIMOS LA VELOCIDAD ANTERIOR A LA VELOCIDAD DEL VIENTO ACTUAL
     }
     // PALAS
     //  SECCION ANEMOMETRO

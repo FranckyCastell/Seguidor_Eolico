@@ -85,7 +85,7 @@ void loop()
   Serial.print("Velocidad del viento: "); // IMPRIMIMOS TEXTO
   Serial.print(velocidadViento);          // IMPRIMIMOS TEXTO
   Serial.println(" m/s");                 // IMPRIMIMOS TEXTO
-  
+
   // ANEMOMETRO
 
   /*   // PALAS
@@ -142,45 +142,45 @@ void loop()
     // PALAS */
 
   // PALAS
-  if (abs(velocidadViento - velocidadVientoAnterior) > margenError)
+  if (abs(velocidadViento - velocidadVientoAnterior) > margenError) // SI LA VELOCIDAD DEL VIENTO ACTUAL - LA VELOCIDAD DEL VIENTO ANTERIOR NO HAY UN MARGEN SUPERIOR A 0.4 QUE NO HAGA NADA
   {
-    if (velocidadViento >= 3.1)
+    if (velocidadViento >= 3.1) // SI LA VELOCIDAD ES IGUAL O SUPERIOR A 3.1 ENTRE EN ESTE CONDICIONAL
     {
-      int anguloActual = SPala1.read();
-      while (anguloActual < 60)
+      int anguloActual = SPala1.read(); // LEE EL ANGULO ACTUAL DE LA PALA 1
+      while (anguloActual < 60)         // MIENTRAS QUE EL ANGULO ACTUAL DE LA PALA 1 ES MENOR QUE 60 GRADOS
       {
-        anguloActual++;
-        SPala1.write(anguloActual);
-        SPala2.write(anguloActual);
-        SPala3.write(anguloActual);
-        delay(400);
+        anguloActual++;             // SUMANDO 1 EN 1 EL ANGULO ACTUAL
+        SPala1.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 60
+        SPala2.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 60
+        SPala3.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 60
+        delay(200);                 // DELAY DE MOVIMIENTO DE LAS PALAS PARA QUE HAGA UN MOVIMIENTO LENTAMENTE
       }
     }
-    else if (velocidadViento <= 1.4)
+    else if (velocidadViento <= 1.4) // SI LA VELOCIDAD ES MENOR O IGUAL A 1.4 ENTRE EN ESTE CONDICIONAL
     {
-      int anguloActual = SPala1.read();
-      while (anguloActual < 60)
+      int anguloActual = SPala1.read(); // LEE EL ANGULO ACTUAL DE LA PALA 1
+      while (anguloActual < 60)         // MIENTRAS QUE EL ANGULO ACTUAL DE LA PALA 1 ES MENOR QUE 60 GRADOS
       {
-        anguloActual++;
-        SPala1.write(anguloActual);
-        SPala2.write(anguloActual);
-        SPala3.write(anguloActual);
-        delay(400);
+        anguloActual++;             // SUMANDO 1 EN 1 EL ANGULO ACTUAL
+        SPala1.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 60
+        SPala2.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 60
+        SPala3.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 60
+        delay(200);                 // DELAY DE MOVIMIENTO DE LAS PALAS PARA QUE HAGA UN MOVIMIENTO LENTAMENTE
       }
     }
-    else if (velocidadViento > 1.5 && velocidadViento < 3.0)
+    else if (velocidadViento > 1.5 && velocidadViento < 3.0) // SI LA VELOCIDAD ES MAYOR A 1.5 & MENOR A 3.0 ENTRE EN ESTE CONDICIONAL
     {
-      int anguloActual = SPala1.read();
-      while (anguloActual > 0)
+      int anguloActual = SPala1.read(); // LEE EL ANGULO ACTUAL DE LA PALA 1
+      while (anguloActual > 0)          // MIENTRAS QUE EL ANGULO ACTUAL DE LA PALA 1 ES MAYOR QUE 0 GRADOS
       {
-        anguloActual--;
-        SPala1.write(anguloActual);
-        SPala2.write(anguloActual);
-        SPala3.write(anguloActual);
-        delay(400);
+        anguloActual--;             // RESTANDO 1 EN 1 EL ANGULO ACTUAL
+        SPala1.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 0
+        SPala2.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 0
+        SPala3.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 0
+        delay(200);                 // DELAY DE MOVIMIENTO DE LAS PALAS PARA QUE HAGA UN MOVIMIENTO LENTAMENTE
       }
     }
-    velocidadVientoAnterior = velocidadViento;
+    velocidadVientoAnterior = velocidadViento; // DEFINIMOS LA VELOCIDAD ANTERIOR A LA VELOCIDAD DEL VIENTO ACTUAL
   }
   // PALAS
 
