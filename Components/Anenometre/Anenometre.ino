@@ -21,7 +21,9 @@ Adafruit_SSD1306 display(ANCHO_PANTALLA, ALTO_PANTALLA, &Wire, -1);
 int Clean_Buffer = 39; // CLEAN BOOFER VALOR "GROUND" = 0
 
 // ANEMOMETRO
-int Anemometro = 4; // PIN DEL ANEMOMETRO " ANALOGICO "
+int Anemometro = 4;                // PIN DEL ANEMOMETRO " ANALOGICO "
+const float margenError = 0.4;     // Margen de ±0.4 m/s
+float velocidadVientoAnterior = 0; // Almacenar la última velocidad del viento que causó un cambio en las palas
 // ANEMOMETRO
 
 // OBJETOS SERVO
@@ -83,7 +85,7 @@ void loop()
   Serial.print("Velocidad del viento: "); // IMPRIMIMOS TEXTO
   Serial.print(velocidadViento);          // IMPRIMIMOS TEXTO
   Serial.println(" m/s");                 // IMPRIMIMOS TEXTO
-  // VELOCIDAD VIENTO
+  
   // ANEMOMETRO
 
   /*   // PALAS
@@ -110,34 +112,74 @@ void loop()
     }
     // PALAS */
 
-  // PALAS
-  const float margenError = 0.4;     // Margen de ±0.4 m/s
-  float velocidadVientoAnterior = 0; // Almacenar la última velocidad del viento que causó un cambio en las palas
+  /*   // PALAS
+    if (abs(velocidadViento - velocidadVientoAnterior) > margenError)
+    {
+      if (velocidadViento >= 3.1)
+      {
+        // VELOCIDAD DEL VIENTO SUPERA LOS 3.1 m/seg PONER A 60 GRADOS
+        SPala1.write(60);
+        SPala2.write(60);
+        SPala3.write(60);
+      }
+      else if (velocidadViento <= 1.4)
+      {
+        // VELOCIDAD DEL VIENTO INFERIOR A LOS 1.4 m/seg PONER A 60 GRADOS
+        SPala1.write(60);
+        SPala2.write(60);
+        SPala3.write(60);
+      }
+      else if (velocidadViento > 1.5 && velocidadViento < 3.0)
+      {
+        // VELOCIDAD DEL VIENTO ENTRE 1.5 m/seg & 3.0 m/seg PONER A 0 GRADOS
+        SPala1.write(0);
+        SPala2.write(0);
+        SPala3.write(0);
+      }
+      // Actualizar la velocidad del viento anterior después de mover las palas
+      velocidadVientoAnterior = velocidadViento;
+    }
+    // PALAS */
 
+  // PALAS
   if (abs(velocidadViento - velocidadVientoAnterior) > margenError)
   {
     if (velocidadViento >= 3.1)
     {
-      // VELOCIDAD DEL VIENTO SUPERA LOS 3.1 m/seg PONER A 90 GRADOS
-      SPala1.write(60);
-      SPala2.write(60);
-      SPala3.write(60);
+      int anguloActual = SPala1.read();
+      while (anguloActual < 60)
+      {
+        anguloActual++;
+        SPala1.write(anguloActual);
+        SPala2.write(anguloActual);
+        SPala3.write(anguloActual);
+        delay(400);
+      }
     }
     else if (velocidadViento <= 1.4)
     {
-      // VELOCIDAD DEL VIENTO INFERIOR A LOS 1.4 m/seg PONER A 90 GRADOS
-      SPala1.write(60);
-      SPala2.write(60);
-      SPala3.write(60);
+      int anguloActual = SPala1.read();
+      while (anguloActual < 60)
+      {
+        anguloActual++;
+        SPala1.write(anguloActual);
+        SPala2.write(anguloActual);
+        SPala3.write(anguloActual);
+        delay(400);
+      }
     }
     else if (velocidadViento > 1.5 && velocidadViento < 3.0)
     {
-      // VELOCIDAD DEL VIENTO ENTRE 1.5 m/seg & 3.0 m/seg PONER A 45 GRADOS
-      SPala1.write(0);
-      SPala2.write(0);
-      SPala3.write(0);
+      int anguloActual = SPala1.read();
+      while (anguloActual > 0)
+      {
+        anguloActual--;
+        SPala1.write(anguloActual);
+        SPala2.write(anguloActual);
+        SPala3.write(anguloActual);
+        delay(400);
+      }
     }
-    // Actualizar la velocidad del viento anterior después de mover las palas
     velocidadVientoAnterior = velocidadViento;
   }
   // PALAS
