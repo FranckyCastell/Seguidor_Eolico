@@ -1,7 +1,7 @@
 // https://bpb-ap-se2.wpmucdn.com/blogs.auckland.ac.nz/dist/9/698/files/2021/08/2_Pinout_D1_R32.png
 
-// MAX 7 m/s BANDERA
-// MIN 3 m/s BANDERA
+// MAX 3.1 m/s BANDERA
+// MIN 1.4 m/s BANDERA
 
 // PALAS PINES [ 26 / 25 / 17 ] DIGITAL
 // ANEMOMETRO PIN [ 4 ] ANALOGICO
@@ -33,7 +33,9 @@ Servo SPala3; // SERVO PARA LA PALA 3
 // CREACION DE LOS SERVO MOTORES PARA CADA UNA DE LAS PALAS
 
 // ANEMOMETRO
-int Anemometro = 4; // PIN DEL ANEMOMETRO " ANALOGICO "
+int Anemometro = 4;                // PIN DEL ANEMOMETRO " ANALOGICO "
+const float margenError = 0.9;     // Margen de ±0.9 m/s
+float velocidadVientoAnterior = 0; // Almacenar la última velocidad del viento que causó un cambio en las palas
 // ANEMOMETRO
 
 // VARIABLES DE LA VELETA
@@ -48,9 +50,15 @@ void setup()
 {
     SPitch.attach(16); // DEFINIMOS SERVOMOTOR PIN 25 ( PITCH )
 
-    SPala1.attach(26); // DEFINIMOS SERVOMOTOR PIN 26 ( PALA1 )
-    SPala2.attach(25); // DEFINIMOS SERVOMOTOR PIN 25 ( PALA2 )
-    SPala3.attach(17); // DEFINIMOS SERVOMOTOR PIN 26 ( PALA3 )
+    // SERVOMOTORES / PALAS
+    SPala1.attach(26);
+    SPala2.attach(25);
+    SPala3.attach(17);
+
+    SPala1.write(0);
+    SPala2.write(0);
+    SPala3.write(0);
+    // SERVOMOTORES / PALAS
 
 // INICIAMOS PANTALLA OLED
 #ifdef __DEBUG__
@@ -107,44 +115,41 @@ void loop()
     {
         if (VelocidadViento >= 3.1) // SI LA VELOCIDAD ES IGUAL O SUPERIOR A 3.1 ENTRE EN ESTE CONDICIONAL
         {
-            int anguloActual = SPala1.read(); // LEE EL ANGULO ACTUAL DE LA PALA 1
-            while (anguloActual < 60)         // MIENTRAS QUE EL ANGULO ACTUAL DE LA PALA 1 ES MENOR QUE 60 GRADOS
+
+            for (int angulo = 0; angulo <= 60; angulo++)
             {
-                anguloActual++;             // SUMANDO 1 EN 1 EL ANGULO ACTUAL
-                SPala1.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 60
-                SPala2.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 60
-                SPala3.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 60
-                delay(200);                 // DELAY DE MOVIMIENTO DE LAS PALAS PARA QUE HAGA UN MOVIMIENTO LENTAMENTE
+                SPala1.write(angulo);
+                SPala2.write(angulo);
+                SPala3.write(angulo);
+                delay(50);
             }
         }
         else if (VelocidadViento <= 1.4) // SI LA VELOCIDAD ES MENOR O IGUAL A 1.4 ENTRE EN ESTE CONDICIONAL
         {
-            int anguloActual = SPala1.read(); // LEE EL ANGULO ACTUAL DE LA PALA 1
-            while (anguloActual < 60)         // MIENTRAS QUE EL ANGULO ACTUAL DE LA PALA 1 ES MENOR QUE 60 GRADOS
+
+            for (int angulo = 0; angulo <= 60; angulo++)
             {
-                anguloActual++;             // SUMANDO 1 EN 1 EL ANGULO ACTUAL
-                SPala1.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 60
-                SPala2.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 60
-                SPala3.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 60
-                delay(200);                 // DELAY DE MOVIMIENTO DE LAS PALAS PARA QUE HAGA UN MOVIMIENTO LENTAMENTE
+                SPala1.write(angulo);
+                SPala2.write(angulo);
+                SPala3.write(angulo);
+                delay(50);
             }
         }
         else if (VelocidadViento > 1.5 && VelocidadViento < 3.0) // SI LA VELOCIDAD ES MAYOR A 1.5 & MENOR A 3.0 ENTRE EN ESTE CONDICIONAL
         {
-            int anguloActual = SPala1.read(); // LEE EL ANGULO ACTUAL DE LA PALA 1
-            while (anguloActual > 0)          // MIENTRAS QUE EL ANGULO ACTUAL DE LA PALA 1 ES MAYOR QUE 0 GRADOS
+
+            for (int angulo = 60; angulo >= 0; angulo--)
             {
-                anguloActual--;             // RESTANDO 1 EN 1 EL ANGULO ACTUAL
-                SPala1.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 0
-                SPala2.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 0
-                SPala3.write(anguloActual); // ESCRIBIR EL ANGULO HASTA LLEGAR A 0
-                delay(200);                 // DELAY DE MOVIMIENTO DE LAS PALAS PARA QUE HAGA UN MOVIMIENTO LENTAMENTE
+                SPala1.write(angulo);
+                SPala2.write(angulo);
+                SPala3.write(angulo);
+                delay(50);
             }
         }
         velocidadVientoAnterior = VelocidadViento; // DEFINIMOS LA VELOCIDAD ANTERIOR A LA VELOCIDAD DEL VIENTO ACTUAL
     }
     // PALAS
-    //  SECCION ANEMOMETRO
+    // SECCION ANEMOMETRO
 
     // SECCION VELETA
     analogRead(Clean_Buffer);          // PONEMOS EL BUFFER A VALOR DE 0
@@ -190,7 +195,7 @@ void loop()
     }
 
     // Mapea el valor analógico a un rango de 0-360 grados para el servomotor
-    Angulo_Servo = map(Valor_Veleta, 0, 4095, 0, 360);
+    Angulo_Servo = map(Valor_Veleta, 0, 4095, 0, 255);
 
     // MOVEMOS SERVOMOTOR AL ANGULO CORRESPONDIENTE
     SPitch.write(Angulo_Servo);
